@@ -66,10 +66,10 @@ function Stopwatch(){
                 <div className="display">{formatTime()}</div>
 
                 <div className="buttons">
-                <button onClick={start} className="start-button">Start</button>
+                <button onClick={start} className="start-button">{isRunning ? "stop": "Start"}</button>
                 <button onClick={stop} className="stop-button">Stop</button>
                 <button onClick={reset} className="reset-button">Reset</button>
-                <button className='lapse-button' onClick={lapse}>Lapse</button>
+                <button className='lapse-button' onClick={lapse}>Lap</button>
 
                 </div>
             </div>
