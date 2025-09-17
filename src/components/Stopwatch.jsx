@@ -62,18 +62,25 @@ function Stopwatch(){
 
     return(
         <div className="stopwatch">
-            <div className="display">{formatTime()}</div>
-            <div className="buttons">
+            <div className="stopwatch-box">
+                <div className="display">{formatTime()}</div>
+
+                <div className="buttons">
                 <button onClick={start} className="start-button">Start</button>
                 <button onClick={stop} className="stop-button">Stop</button>
                 <button onClick={reset} className="reset-button">Reset</button>
                 <button className='lapse-button' onClick={lapse}>Lapse</button>
 
+                </div>
             </div>
 
-            
             <Lap time={lapseTime}/>
+            
+
+
         </div>
+        
+        
     );
 
 }
