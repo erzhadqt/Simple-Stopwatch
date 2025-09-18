@@ -86,6 +86,7 @@ function Stopwatch(){
                 <button className='lapse-button' onClick={lapse}>Lap</button>
 
                 </div>
+                
             </div>
 
             <Lap time={lapseTime}/>
