@@ -1,64 +1,69 @@
-import React, {useState, useEffect, useRef} from 'react';
+import React, { useState, useEffect } from 'react';
 import "../assets/css/stopwatch.css";
 import Lap from './Lap';
 
-function Stopwatch(){
-
+function Stopwatch() {
     const [isRunning, setIsRunning] = useState(false);
     const [elapsedTime, setElapsedTime] = useState(0);
-    const intervalIdRef = useRef(null);
-    const startTimeRef = useRef(0);
     const [lapseTime, setLapseTime] = useState("");
+    const [lastStartTime, setLastStartTime] = useState(null);
 
     useEffect(() => {
+        let intervalId = null;
 
-        if(isRunning){
-            intervalIdRef.current = setInterval(() => {
-                setElapsedTime(Date.now() - startTimeRef.current);
+        if (isRunning) {
+            // If starting, set lastStartTime if not set
+            if (lastStartTime === null) {
+                setLastStartTime(Date.now());
+            }
+            intervalId = setInterval(() => {
+                setElapsedTime(prevElapsed => {
+                    if (lastStartTime !== null) {
+                        return prevElapsed + (Date.now() - lastStartTime);
+                    }
+                    return prevElapsed;
+                });
+                setLastStartTime(Date.now());
             }, 10);
         }
 
         return () => {
-            clearInterval(intervalIdRef.current);
-        }
+            clearInterval(intervalId);
+        };
+    }, [isRunning, lastStartTime]);
 
-    }, [isRunning]);
-
-    // function start(){
-    //     setIsRunning(true);
-    //     startTimeRef.current = Date.now() - elapsedTime;
-    // }
-    function startOrStop(){
-        if (!isRunning){
-            setIsRunning(true)
-            startTimeRef.current = Date.now() - elapsedTime;
-        }
-        else{
+    function startOrStop() {
+        if (!isRunning) {
+            setIsRunning(true);
+            setLastStartTime(Date.now());
+        } else {
             setIsRunning(false);
+            setLastStartTime(null);
         }
     }
 
-    function stop(){
-        setIsRunning(false);
-    }
-
-    function reset(){
+    function reset() {
         setElapsedTime(0);
         setIsRunning(false);
         setLapseTime("");
+        setLastStartTime(null);
     }
 
-    function lapse(){
-        if(!isRunning) return;
+    function lapse() {
+        if (!isRunning) return;
         setLapseTime(formatTime());
     }
 
-    function formatTime(){
+    function formatTime() {
+        let totalElapsed = elapsedTime;
+        if (isRunning && lastStartTime !== null) {
+            totalElapsed += Date.now() - lastStartTime;
+        }
 
-        let hours = Math.floor(elapsedTime / (1000 * 60 * 60));
-        let minutes = Math.floor(elapsedTime / (1000 * 60) % 60);
-        let seconds = Math.floor((elapsedTime / 1000) % 60);
-        let milliseconds = Math.floor((elapsedTime % 1000) / 10);
+        let hours = Math.floor(totalElapsed / (1000 * 60 * 60));
+        let minutes = Math.floor((totalElapsed / (1000 * 60)) % 60);
+        let seconds = Math.floor((totalElapsed / 1000) % 60);
+        let milliseconds = Math.floor((totalElapsed % 1000) / 10);
 
         hours = String(hours).padStart(2, "0");
         minutes = String(minutes).padStart(2, "0");
@@ -66,35 +71,25 @@ function Stopwatch(){
         milliseconds = String(milliseconds).padStart(2, "0");
 
         return `${hours}:${minutes}:${seconds}:${milliseconds}`;
-
     }
 
-    return(
+    return (
         <div className="stopwatch">
             <div className="stopwatch-box">
                 <div className="display">{formatTime()}</div>
-
                 <div className="buttons">
-                {/* <button onClick={start} className="start-button">Start</button> */}
-                {/* <button onClick={stop} className="stop-button">Stop</button> */}
-
-                {
-                    !isRunning ? <button className='start-button' onClick={startOrStop}>Start</button> : <button className='stop-button' onClick={startOrStop}>Stop</button>
-                }
-
-                <button onClick={reset} className="reset-button">Reset</button>
-                <button className='lapse-button' onClick={lapse}>Lap</button>
-
+                    {
+                        !isRunning
+                            ? <button className='start-button' onClick={startOrStop}>Start</button>
+                            : <button className='stop-button' onClick={startOrStop}>Stop</button>
+                    }
+                    <button onClick={reset} className="reset-button">Reset</button>
+                    <button className='lapse-button' onClick={lapse}>Lap</button>
                 </div>
-                
             </div>
-
-            <Lap time={lapseTime}/>
-            
+            <Lap time={lapseTime} />
         </div>
-        
-        
     );
-
 }
+
 export default Stopwatch;
