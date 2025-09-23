@@ -5,40 +5,29 @@ import Lap from './Lap';
 function Stopwatch() {
     const [isRunning, setIsRunning] = useState(false);
     const [elapsedTime, setElapsedTime] = useState(0);
+    const [startTime, setStartTime] = useState(null);
     const [lapseTime, setLapseTime] = useState("");
-    const [lastStartTime, setLastStartTime] = useState(null);
 
     useEffect(() => {
-        let intervalId = null;
+        let intervalId;
 
         if (isRunning) {
-            // If starting, set lastStartTime if not set
-            if (lastStartTime === null) {
-                setLastStartTime(Date.now());
-            }
             intervalId = setInterval(() => {
-                setElapsedTime(prevElapsed => {
-                    if (lastStartTime !== null) {
-                        return prevElapsed + (Date.now() - lastStartTime);
-                    }
-                    return prevElapsed;
-                });
-                setLastStartTime(Date.now());
+                setElapsedTime(Date.now() - startTime);
             }, 10);
         }
 
         return () => {
             clearInterval(intervalId);
         };
-    }, [isRunning, lastStartTime]);
+    }, [isRunning, startTime]);
 
     function startOrStop() {
         if (!isRunning) {
             setIsRunning(true);
-            setLastStartTime(Date.now());
+            setStartTime(Date.now() - elapsedTime);
         } else {
             setIsRunning(false);
-            setLastStartTime(null);
         }
     }
 
@@ -46,7 +35,7 @@ function Stopwatch() {
         setElapsedTime(0);
         setIsRunning(false);
         setLapseTime("");
-        setLastStartTime(null);
+        setStartTime(null);
     }
 
     function lapse() {
@@ -55,15 +44,10 @@ function Stopwatch() {
     }
 
     function formatTime() {
-        let totalElapsed = elapsedTime;
-        if (isRunning && lastStartTime !== null) {
-            totalElapsed += Date.now() - lastStartTime;
-        }
-
-        let hours = Math.floor(totalElapsed / (1000 * 60 * 60));
-        let minutes = Math.floor((totalElapsed / (1000 * 60)) % 60);
-        let seconds = Math.floor((totalElapsed / 1000) % 60);
-        let milliseconds = Math.floor((totalElapsed % 1000) / 10);
+        let hours = Math.floor(elapsedTime / (1000 * 60 * 60));
+        let minutes = Math.floor((elapsedTime / (1000 * 60)) % 60);
+        let seconds = Math.floor((elapsedTime / 1000) % 60);
+        let milliseconds = Math.floor((elapsedTime % 1000) / 10);
 
         hours = String(hours).padStart(2, "0");
         minutes = String(minutes).padStart(2, "0");
