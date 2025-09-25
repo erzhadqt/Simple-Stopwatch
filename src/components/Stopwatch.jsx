@@ -7,7 +7,8 @@ function Stopwatch() {
     const [elapsedTime, setElapsedTime] = useState(0);
     const [startTime, setStartTime] = useState(null);
     const [lapseTime, setLapseTime] = useState("");
-    const [hasStarted, setHasStarted] = useState(false)
+    const [hasStarted, setHasStarted] = useState(false);
+
 
     useEffect(() => {
         let intervalId;
