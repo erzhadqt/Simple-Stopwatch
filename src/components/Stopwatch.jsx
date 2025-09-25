@@ -7,6 +7,7 @@ function Stopwatch() {
     const [elapsedTime, setElapsedTime] = useState(0);
     const [startTime, setStartTime] = useState(null);
     const [lapseTime, setLapseTime] = useState("");
+    const [hasStarted, setHasStarted] = useState(false)
 
     useEffect(() => {
         let intervalId;
@@ -25,6 +26,8 @@ function Stopwatch() {
     function startOrStop() {
         if (!isRunning) {
             setIsRunning(true);
+            setHasStarted(true);
+
             setStartTime(Date.now() - elapsedTime);
         } else {
             setIsRunning(false);
@@ -34,6 +37,7 @@ function Stopwatch() {
     function reset() {
         setElapsedTime(0);
         setIsRunning(false);
+        setHasStarted(false);
         setLapseTime("");
         setStartTime(null);
     }
@@ -64,7 +68,7 @@ function Stopwatch() {
                 <div className="buttons">
                     {
                         !isRunning
-                            ? <button className='start-button' onClick={startOrStop}>Start</button>
+                            ? <button className='start-button' onClick={startOrStop}>{hasStarted ? "Resume" : "Start"}</button> 
                             : <button className='stop-button' onClick={startOrStop}>Stop</button>
                     }
                     <button onClick={reset} className="reset-button">Reset</button>
